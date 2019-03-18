@@ -20,13 +20,18 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define WHITE 0x7
 String strength;
 String d;
+const int i1;
+const int i2;
+const int i3;
+bool make = false;
 enum Drink {
   d1,
   d2,
   d3,
   strong,
   virgin,
-  regular
+  regular,
+  sure
 };
 
 Drink drink = d1;
@@ -34,27 +39,22 @@ Drink drink = d1;
 void setup() {
   // Debugging output
   Serial.begin(9600);
-  // set up the LCD's number of columns and rows:
+  
   lcd.begin(16, 2);
-
-  // Print a message to the LCD. We track how long it takes since
-  // this library has been optimized a bit and we're proud of it :)
-  int time = millis();
+  pinMode(3, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode (i1, INPUT);
+  pinMode(i2, INPUT);
+  pinMode(i3, INPUT);
   lcd.print("Drink 1");
-  time = millis() - time;
-  Serial.print("Took "); Serial.print(time); Serial.println(" ms");
-  lcd.setBacklight(WHITE);
+  
 }
 
 uint8_t i = 0;
 void loop() {
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-  lcd.setCursor(0, 1);
-  // print the number of seconds since reset:
-  //lcd.print(millis() / 1000);
+  
   lcd.setCursor(0, 0);
-
   uint8_t buttons = lcd.readButtons();
 
   /*if (buttons) {
@@ -82,7 +82,7 @@ void loop() {
       lcd.print("SELECT ");
       lcd.setBacklight(VIOLET);
     }*/
-  if (strength == "") {
+  if (make == false) {
     switch (drink) {
       case d1:
         if (buttons & BUTTON_RIGHT) {
@@ -96,27 +96,37 @@ void loop() {
           drink = d3;
         }
         else if (buttons & BUTTON_SELECT) {
+          digitalWrite(3, HIGH);
+          lcd.setBacklight(RED);
           delay(500);
           lcd.print("Regular ");
           drink = regular;
           d = "d1";
           Serial.println(d);
+          //digitalWrite(13,LOW);
+          
         }
         break;
 
       case d2:
+
         if (buttons & BUTTON_RIGHT) {
           delay(500);
           lcd.print("Drink 3 ");
           drink = d3;
         }
         else if (buttons & BUTTON_LEFT) {
+          //digitalWrite(9,HIGH);
           delay(500);
+          //digitalWrite(9,LOW);
           lcd.print("Drink 1 ");
           drink = d1;
         }
         else if (buttons & BUTTON_SELECT) {
+          lcd.setBacklight(GREEN);
+          digitalWrite(7, HIGH);
           delay(500);
+          //digitalWrite(7,LOW);
           lcd.print("Regular ");
           drink = regular;
           d = "d2";
@@ -136,11 +146,15 @@ void loop() {
           drink = d2;
         }
         else if (buttons & BUTTON_SELECT) {
+          digitalWrite(5, HIGH);
+          lcd.setBacklight(YELLOW);
           delay(500);
+          //digitalWrite(5,LOW);
           lcd.print("Regular ");
           drink = regular;
           d = "d3";
           Serial.println(d);
+          
         }
         break;
 
@@ -157,11 +171,21 @@ void loop() {
         }
         else if (buttons & BUTTON_SELECT) {
           delay(500);
-          lcd.print("Making ");
+          lcd.print("Are you sure: ");
 
           strength = "regular";
           //call to drink function
-          Serial.println(strength);
+          drink = sure;
+        }
+        else if (buttons & BUTTON_UP) {
+          drink = d1;
+          d = "";
+          lcd.print("Drink 1 ");
+          lcd.setBacklight(WHITE);
+          digitalWrite(3,LOW);
+          digitalWrite(5,LOW);
+          digitalWrite(7,LOW);
+          delay(500);
         }
         break;
 
@@ -178,11 +202,25 @@ void loop() {
         }
         else if (buttons & BUTTON_SELECT) {
           delay(500);
-          lcd.print("Making ");
+          lcd.print("Are you sure: ");
+
+          
+          //call to drink function
+          drink = sure;
 
           strength = "strong";
           //call to drink function
-          Serial.println(strength);
+          
+        }
+        else if (buttons & BUTTON_UP) {
+          drink = d1;
+          d = "";
+          lcd.print("Drink 1 ");
+          lcd.setBacklight(WHITE);
+          digitalWrite(3,LOW);
+          digitalWrite(5,LOW);
+          digitalWrite(7,LOW);
+          delay(500);
         }
         break;
 
@@ -199,12 +237,55 @@ void loop() {
         }
         else if (buttons & BUTTON_SELECT) {
           delay(500);
-          lcd.print("Making ");
+         lcd.print("Are you sure: ");
+
+          
+          //call to drink function
+          drink = sure;
           strength = "virgin";
           //call to drink function
+          
+        }
+        else if (buttons & BUTTON_UP) {
+          drink = d1;
+          d = "";
+          lcd.print("Drink 1 ");
+          lcd.setBacklight(WHITE);
+          digitalWrite(3,LOW);
+          digitalWrite(5,LOW);
+          digitalWrite(7,LOW);
+          delay(500);
+        }
+        break;
+
+        case sure:
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("Making       ");
+          
+          //call to drink function
           Serial.println(strength);
+          make = true;
+        }
+        else if (buttons & BUTTON_UP) {
+          lcd.clear();
+          drink = d1;
+          d = "";
+          strength = "";
+          lcd.print("Drink 1 ");
+          lcd.setBacklight(WHITE);
+          digitalWrite(3,LOW);
+          digitalWrite(5,LOW);
+          digitalWrite(7,LOW);
+          delay(500);
         }
         break;
     }
   }
+//  else {
+//    //check suppiles
+//    int c [3];
+//    c = check();
+//    // make drink
+//  }
 }
