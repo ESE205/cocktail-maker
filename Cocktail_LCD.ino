@@ -20,9 +20,7 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define WHITE 0x7
 String strength;
 String d;
-const int i1;
-const int i2;
-const int i3;
+
 
 bool b1 = false;
 bool b2 = false;
@@ -36,7 +34,7 @@ int full1 = analogRead(lightPen1); //sets initial condition for bottle 1
 int full2 = analogRead(lightPen2); //sets initial condition for bottle 2
 int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
 
-bool make = false;
+
 enum Drink {
   d1,
   d2,
@@ -59,9 +57,6 @@ void setup() {
   pinMode(3, OUTPUT);
   pinMode(7, OUTPUT);
   pinMode(5, OUTPUT);
-  pinMode (i1, INPUT);
-  pinMode(i2, INPUT);
-  pinMode(i3, INPUT);
   lcd.print("Drink 1");
 
 }
@@ -93,7 +88,7 @@ void loop() {
         drink = regular;
         d = "d1";
         Serial.println(d);
-        //digitalWrite(13,LOW);
+        
 
       }
       break;
@@ -106,9 +101,9 @@ void loop() {
         drink = d3;
       }
       else if (buttons & BUTTON_LEFT) {
-        //digitalWrite(9,HIGH);
+        
         delay(500);
-        //digitalWrite(9,LOW);
+       
         lcd.print("Drink 1 ");
         drink = d1;
       }
@@ -116,7 +111,7 @@ void loop() {
         lcd.setBacklight(GREEN);
         digitalWrite(7, HIGH);
         delay(500);
-        //digitalWrite(7,LOW);
+        
         lcd.print("Regular ");
         drink = regular;
         d = "d2";
@@ -139,7 +134,7 @@ void loop() {
         digitalWrite(5, HIGH);
         lcd.setBacklight(YELLOW);
         delay(500);
-        //digitalWrite(5,LOW);
+        
         lcd.print("Regular ");
         drink = regular;
         d = "d3";
@@ -203,13 +198,11 @@ void loop() {
 
         strength = "strong";
         lcd.setCursor(0, 1);
-        //call to drink function
+        
         lcd.print(d);
         lcd.print(" ");
         lcd.print(strength);
-        //call to drink function
-
-        //call to drink function
+      
 
       }
       else if (buttons & BUTTON_UP) {
@@ -315,12 +308,7 @@ void loop() {
       drink = d1;
       break;
   }
-  //  else {
-  //    //check suppiles
-  //    int c [3];
-  //    c = check();
-  //    // make drink
-  //  }
+ 
 }
 
 
