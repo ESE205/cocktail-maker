@@ -2,8 +2,14 @@
 #include <Wire.h>
 #include <Adafruit_RGBLCDShield.h>
 #include <utility/Adafruit_MCP23017.h>
+#include "HX711.h"
 
+#define calibration_factor -7050.0 //This value is obtained using the SparkFun_HX711_Calibration sketch
 
+#define DOUT  8
+#define CLK  9
+
+HX711 scale;
 // The shield uses the I2C SCL and SDA pins. On classic Arduinos
 // this is Analog 4 and 5 so you can't use those for analogRead() anymore
 // However, you can connect other I2C sensors to the I2C bus and share
@@ -52,6 +58,9 @@ Drink drink = d1;
 void setup() {
   // Debugging output
   Serial.begin(9600);
+  scale.begin(DOUT, CLK);
+  scale.set_scale(calibration_factor); //This value is obtained by using the SparkFun_HX711_Calibration sketch
+  scale.tare(); //Assuming there is no weight on the scale at start up, reset the scale to 0
   analogReference(INTERNAL);
   lcd.begin(16, 2);
   pinMode(3, OUTPUT);
@@ -66,7 +75,7 @@ void loop() {
 
   lcd.setCursor(0, 0);
   uint8_t buttons = lcd.readButtons();
-
+  weight(5);
 
   switch (drink) {
     case d1:
@@ -88,7 +97,7 @@ void loop() {
         drink = regular;
         d = "d1";
         Serial.println(d);
-        
+
 
       }
       break;
@@ -101,9 +110,9 @@ void loop() {
         drink = d3;
       }
       else if (buttons & BUTTON_LEFT) {
-        
+
         delay(500);
-       
+
         lcd.print("Drink 1 ");
         drink = d1;
       }
@@ -111,7 +120,7 @@ void loop() {
         lcd.setBacklight(GREEN);
         digitalWrite(7, HIGH);
         delay(500);
-        
+
         lcd.print("Regular ");
         drink = regular;
         d = "d2";
@@ -134,7 +143,7 @@ void loop() {
         digitalWrite(5, HIGH);
         lcd.setBacklight(YELLOW);
         delay(500);
-        
+
         lcd.print("Regular ");
         drink = regular;
         d = "d3";
@@ -198,11 +207,11 @@ void loop() {
 
         strength = "strong";
         lcd.setCursor(0, 1);
-        
+
         lcd.print(d);
         lcd.print(" ");
         lcd.print(strength);
-      
+
 
       }
       else if (buttons & BUTTON_UP) {
@@ -308,7 +317,7 @@ void loop() {
       drink = d1;
       break;
   }
- 
+
 }
 
 
@@ -341,4 +350,16 @@ bool check3() {
     return true;
   }
   return false;
+}
+
+bool weight(int w) {
+  Serial.print("Reading: ");
+  float r = scale.get_units(); //scale.get_units() returns a float
+  Serial.print(" lbs"); //You can change this to kg but you'll need to refactor the calibration_factor
+  Serial.println();
+  if (w == r) {
+    return true;
+  }
+  return false;
+
 }
