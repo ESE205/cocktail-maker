@@ -26,7 +26,11 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define WHITE 0x7
 String strength;
 String d;
+String pDrink;
 
+float w1 = 2;
+float w2 = 3;
+float w3 = 5;
 
 bool b1 = false;
 bool b2 = false;
@@ -45,12 +49,17 @@ enum Drink {
   d1,
   d2,
   d3,
+  setI1,
+  setI2,
+  setI3,
   strong,
   virgin,
   regular,
   sure,
   check,
-  make
+  m1,
+  m2,
+  m3
 };
 
 Drink drink = d1;
@@ -94,7 +103,7 @@ void loop() {
         lcd.setBacklight(RED);
         delay(500);
         lcd.print("Regular ");
-        drink = regular;
+        drink = setI1;
         d = "d1";
         Serial.println(d);
 
@@ -122,7 +131,7 @@ void loop() {
         delay(500);
 
         lcd.print("Regular ");
-        drink = regular;
+        drink = setI1;
         d = "d2";
         Serial.println(d);
       }
@@ -145,13 +154,99 @@ void loop() {
         delay(500);
 
         lcd.print("Regular ");
-        drink = regular;
+        drink = setI1;
         d = "d3";
         Serial.println(d);
 
       }
       break;
 
+      
+   case setI1:
+      if (d == pDrink) {
+        d = regular;
+        break;
+      }
+      else if (d == "d1") {
+        lcd.print("i1 to bottle1");
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("i2 to bottle2");
+          drink = setI2;
+          break;
+        }
+      }
+      else if (d == "d2") {
+        lcd.print("i1 to bottle1");
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("i2 to bottle2");
+          drink = setI2;
+          break;
+        }
+      }
+      else if (d == "d3") {
+        lcd.print("i1 to bottle1");
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("i2 to bottle2");
+          drink = setI2;
+          break;
+        }
+      }
+
+    case setI2:
+      if (d == "d1") {
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("i3 to bottle3");
+          drink = setI3;
+          break;
+        }
+      }
+      else if (d == "d2") {
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("i3 to bottle3");
+          drink = setI3;
+          break;
+        }
+      }
+      else if (d == "d3") {
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("i3 to bottle3");
+          drink = setI3;
+          break;
+        }
+      }
+
+ 
+case setI3:
+      if (d == "d1") {
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("Regular    ");
+          drink = regular;
+          break;
+        }
+      }
+      else if (d == "d2") {
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("Regular     ");
+          drink = regular;
+          break;
+        }
+      }
+      else if (d == "d3") {
+        if (buttons & BUTTON_SELECT) {
+          delay(500);
+          lcd.print("Regular       ");
+          drink = regular;
+          break;
+        }
+      }
     case regular:
       if (buttons & BUTTON_RIGHT) {
         delay(500);
@@ -271,7 +366,7 @@ void loop() {
       if (buttons & BUTTON_SELECT) {
         delay(500);
         lcd.print("Making      ");
-
+        pDrink = d;
         Serial.print(d);
         Serial.print(" ");
         Serial.print(strength);
@@ -307,14 +402,32 @@ void loop() {
         lcd.print(b);
         break;
       }
-      drink = make;
+      drink = m1;
       break;
-    case make:
+    case m1:
       lcd.clear();
       lcd.print("making");
-      //do work
-      delay(5000);
+      //      bool glass = weight(w1);
+      //      if (glass) {
+      drink = m2;
+      //        break;
+      //      }
+      break;
+    case m2:
+
+      //      bool glass = weight(w2);
+      //      if (glass) {
+      drink = m3;
+      //        break;
+      //      }
+      break;
+    case m3:
+      //
+      //      bool glass = weight(w3);
+      //      if (glass) {
       drink = d1;
+      //        break;
+      //      }
       break;
   }
 
@@ -352,12 +465,12 @@ bool check3() {
   return false;
 }
 
-bool weight(int w) {
+bool weight(float w) {
   Serial.print("Reading: ");
   float r = scale.get_units(); //scale.get_units() returns a float
   Serial.print(" lbs"); //You can change this to kg but you'll need to refactor the calibration_factor
   Serial.println();
-  if (w == r) {
+  if (w >= r) {
     return true;
   }
   return false;
