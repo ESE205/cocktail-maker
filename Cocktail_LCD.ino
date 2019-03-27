@@ -24,15 +24,16 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define BLUE 0x4
 #define VIOLET 0x5
 #define WHITE 0x7
-String strength;
+
+String strength;//state machine
 String d;
 String pDrink;
 
-float w1 = 2;
+float w1 = 2;//The predetermind weights 
 float w2 = 3;
 float w3 = 5;
 
-bool b1 = false;
+bool b1 = false;// check
 bool b2 = false;
 bool b3 = false;
 String b = "check b: ";
@@ -45,7 +46,7 @@ int full2 = analogRead(lightPen2); //sets initial condition for bottle 2
 int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
 
 
-enum Drink {
+enum Drink { // state machine
   d1,
   d2,
   d3,
@@ -62,19 +63,18 @@ enum Drink {
   m3
 };
 
-Drink drink = d1;
+Drink drink = d1; // state machine
 
 void setup() {
   // Debugging output
   Serial.begin(9600);
-  scale.begin(DOUT, CLK);
+  
+  scale.begin(DOUT, CLK);// scale
   scale.set_scale(calibration_factor); //This value is obtained by using the SparkFun_HX711_Calibration sketch
   scale.tare(); //Assuming there is no weight on the scale at start up, reset the scale to 0
   analogReference(INTERNAL);
-  lcd.begin(16, 2);
-  pinMode(3, OUTPUT);
-  pinMode(7, OUTPUT);
-  pinMode(5, OUTPUT);
+  
+  lcd.begin(16, 2); //LCD 
   lcd.print("Drink 1");
 
 }
@@ -82,11 +82,11 @@ void setup() {
 uint8_t i = 0;
 void loop() {
 
-  lcd.setCursor(0, 0);
-  uint8_t buttons = lcd.readButtons();
-  weight(5);
+  lcd.setCursor(0, 0);//LCD
+  uint8_t buttons = lcd.readButtons();//LCD
+  //weight(5);
 
-  switch (drink) {
+  switch (drink) {//State Machine
     case d1:
       if (buttons & BUTTON_RIGHT) {
         delay(500);
@@ -434,7 +434,7 @@ case setI3:
 }
 
 
-
+// helper methods
 
 bool check1() {
   if (analogRead(lightPen1) < .8 * full1) { //Tests to see if bottle 1 is empty
