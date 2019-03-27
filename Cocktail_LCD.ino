@@ -88,17 +88,17 @@ void loop() {
 
   switch (drink) {//State Machine
     case d1:
-      if (buttons & BUTTON_RIGHT) {
+      if (buttons & BUTTON_RIGHT) {//swtiches state
         delay(500);
         lcd.print("Drink 2 ");
         drink = d2;
       }
-      else if (buttons & BUTTON_LEFT) {
+      else if (buttons & BUTTON_LEFT) {//swtiches state
         delay(500);
         lcd.print("Drink 3 ");
         drink = d3;
       }
-      else if (buttons & BUTTON_SELECT) {
+      else if (buttons & BUTTON_SELECT) {//swtiches state
         digitalWrite(3, HIGH);
         lcd.setBacklight(RED);
         delay(500);
@@ -113,19 +113,19 @@ void loop() {
 
     case d2:
 
-      if (buttons & BUTTON_RIGHT) {
+      if (buttons & BUTTON_RIGHT) {//swtiches state
         delay(500);
         lcd.print("Drink 3 ");
         drink = d3;
       }
-      else if (buttons & BUTTON_LEFT) {
+      else if (buttons & BUTTON_LEFT) {//swtiches state
 
         delay(500);
 
         lcd.print("Drink 1 ");
         drink = d1;
       }
-      else if (buttons & BUTTON_SELECT) {
+      else if (buttons & BUTTON_SELECT) {//swtiches state
         lcd.setBacklight(GREEN);
         digitalWrite(7, HIGH);
         delay(500);
@@ -138,17 +138,17 @@ void loop() {
       break;
 
     case d3:
-      if (buttons & BUTTON_RIGHT) {
+      if (buttons & BUTTON_RIGHT) {//Change ingredents
         delay(500);
         lcd.print("Drink 1 ");
         drink = d1;
       }
-      else if (buttons & BUTTON_LEFT) {
+      else if (buttons & BUTTON_LEFT) {//Change ingredents
         delay(500);
         lcd.print("Drink 2 ");
         drink = d2;
       }
-      else if (buttons & BUTTON_SELECT) {
+      else if (buttons & BUTTON_SELECT) {//Change ingredents
         digitalWrite(5, HIGH);
         lcd.setBacklight(YELLOW);
         delay(500);
@@ -163,11 +163,12 @@ void loop() {
 
       
    case setI1:
-      if (d == pDrink) {
+      if (d == pDrink) {// Drinks are the same as the previous
         d = regular;
+        lcd.print("Regular     ");
         break;
       }
-      else if (d == "d1") {
+      else if (d == "d1") {// Drinks differ
         lcd.print("i1 to bottle1");
         if (buttons & BUTTON_SELECT) {
           delay(500);
@@ -222,7 +223,7 @@ void loop() {
       }
 
  
-case setI3:
+case setI3: //After this state, the drinks switch 
       if (d == "d1") {
         if (buttons & BUTTON_SELECT) {
           delay(500);
@@ -258,7 +259,7 @@ case setI3:
         lcd.print("Virgin ");
         drink = virgin;
       }
-      else if (buttons & BUTTON_SELECT) {
+      else if (buttons & BUTTON_SELECT) {//Strength seleceted
         delay(500);
         lcd.print("Are you sure: ");
         lcd.setCursor(0, 1);
@@ -271,7 +272,7 @@ case setI3:
         //call to drink function
         drink = sure;
       }
-      else if (buttons & BUTTON_UP) {
+      else if (buttons & BUTTON_UP) {//return to start
         drink = d1;
         d = "";
         lcd.clear();
@@ -295,7 +296,7 @@ case setI3:
         lcd.print("Regular ");
         drink = regular;
       }
-      else if (buttons & BUTTON_SELECT) {
+      else if (buttons & BUTTON_SELECT) {//Strength seleceted
         delay(500);
         lcd.print("Are you sure: ");
         drink = sure;
@@ -309,7 +310,7 @@ case setI3:
 
 
       }
-      else if (buttons & BUTTON_UP) {
+      else if (buttons & BUTTON_UP) {//return to start
         drink = d1;
         d = "";
         lcd.clear();
@@ -333,7 +334,7 @@ case setI3:
         lcd.print("Strong ");
         drink = strong;
       }
-      else if (buttons & BUTTON_SELECT) {
+      else if (buttons & BUTTON_SELECT) {//Strength selected
         delay(500);
         lcd.print("Are you sure: ");
         drink = sure;
@@ -349,7 +350,7 @@ case setI3:
         //call to drink function
 
       }
-      else if (buttons & BUTTON_UP) {
+      else if (buttons & BUTTON_UP) {//return to start
         drink = d1;
         d = "";
         lcd.clear();
@@ -363,7 +364,7 @@ case setI3:
       break;
 
     case sure:
-      if (buttons & BUTTON_SELECT) {
+      if (buttons & BUTTON_SELECT) { //Checks
         delay(500);
         lcd.print("Making      ");
         pDrink = d;
@@ -372,7 +373,7 @@ case setI3:
         Serial.print(strength);
         drink = check;
       }
-      else if (buttons & BUTTON_UP) {
+      else if (buttons & BUTTON_UP) {//return to start
         lcd.clear();
         drink = d1;
         d = "";
@@ -387,45 +388,49 @@ case setI3:
       break;
     case check:
       b1 = check1();
-      if (b1 == false) {
+      if (b1 == false) {//if b1 is empty
         b = b + "1 ";
       }
       b2 = check2();
-      if (b2 == false) {
+      if (b2 == false) {//if b2 is empty
         b = b + "2 ";
       }
       b3 = check3();
-      if (b3 == false) {
+      if (b3 == false) {//if b3 is empty
         b = b + "3 ";
       }
-      if (b1 || b2 || b3) {
+      if (b1 || b2 || b3) { // if a bottle is empty
         lcd.print(b);
         break;
       }
-      drink = m1;
+      drink = m1;//if full then make starts
       break;
     case m1:
       lcd.clear();
       lcd.print("making");
       //      bool glass = weight(w1);
-      //      if (glass) {
-      drink = m2;
+      //      if (glass) {// checks weight
+      drink = m2; // switches motors
       //        break;
       //      }
       break;
     case m2:
 
       //      bool glass = weight(w2);
-      //      if (glass) {
-      drink = m3;
+      //      if (glass) {// checks weight
+      drink = m3;// switches motors
       //        break;
       //      }
       break;
     case m3:
       //
       //      bool glass = weight(w3);
-      //      if (glass) {
-      drink = d1;
+      //      if (glass) {// checks weight
+      lcd.print("Drink Made");
+      delay(5000);
+      lcd.clear();
+      lcd.print("Drink 1");
+      drink = d1; //returns to start
       //        break;
       //      }
       break;
