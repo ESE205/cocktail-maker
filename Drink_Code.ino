@@ -1,6 +1,4 @@
-/*This program is DrinkRobotMaiTie and makes the spectacular
-
-* drink Margot's Mai Tai
+/*This program is DrinkRobotMaiTie 
 
 * and was written by
 
@@ -12,11 +10,14 @@
 
 */
 
-#define Vodka 1                                                       // (pump1)12VDC motor to pump vodka on pin 1
+//Modifications by Cj Wilson this code will make 3 different drink combinations at 3 different strengths
+// Each drink will be 330g. Strong=75g regular=40g
 
-#define Gingerale 2                                                   // (pump2) Gingerale connected to pin 2
+#define Vodka 3                                                       // (pump1)12VDC motor to pump vodka on pin 3
 
-#define CranMango 3                                                   // (pump3) CranMango on pin 3
+#define Gingerale 4                                                   // (pump2) Gingerale connected to pin 4
+
+#define CranMango 5                                                   // (pump3) CranMango on pin 5
 
 //int sensorPin = A0;                                                 // analog read : used to tell if doorbell switch is pushed
 
@@ -47,11 +48,11 @@ void loop()
 
                                                                       //Vodka Gingerale Strong
 if (d=="d1" && strength=="strong"){
-  while (get.units()<103){
+  while (scale.get_units()<75){
     digitalWrite (Vodka, LOW);                                        //pump 1 on
   }
   digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
-  while(get.units()<330 && get.units()>=103){
+  while(scale.get_units()<331 && scale.get_units()>=74){
   digitalWrite (Gingerale, LOW);                                      //pump 2 on
   }
   digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
@@ -60,11 +61,11 @@ if (d=="d1" && strength=="strong"){
 //////////////////////////////////////////////////////////////////
                                                                       //Vodka Gingerale Regular
 if (d=="d1" && strength=="regular"){
-  while (get.units()<55){
+  while (scale.get_units()<41){
     digitalWrite (Vodka, LOW);                                        //pump 1 on
   }
   digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
-  while(get.units()<330 && get.units()>=55){
+  while(scale.get_units()<331 && scale.get_units()>=40){
   digitalWrite (Gingerale, LOW);                                      //pump 2 on
   }
   digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
@@ -73,7 +74,7 @@ if (d=="d1" && strength=="regular"){
 ///////////////////////////////////////////////////////////////////
                                                                       //Vodka Gingerale virgin
 if (d=="d1" && strength=="virgin"){
-  while(get.units()<330){
+  while(scale.get_units()<331){
   digitalWrite (Gingerale, LOW);                                      //pump 2 on
   }
   digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
@@ -82,11 +83,11 @@ if (d=="d1" && strength=="virgin"){
 /////////////////////////////////////////////////////////////////////
                                                                      //Vodka CranMango Strong
 if (d=="d2" && strength=="strong"){
-  while (get.units()<103){
+  while (scale.get_units()<75){
     digitalWrite (Vodka, LOW);                                       //pump 1 on
   }
   digitalWrite (Vodka, HIGH);                                        // Turns pump 1 off
-  while(get.units()<330 && get.units()>=103){
+  while(scale.get_units()<331 && scale.get_units()>=74){
   digitalWrite (CranMango, LOW);                                     //pump 3 on
   }
   digitalWrite(CranMango, HIGH);                                     // Pump 3 off
@@ -95,11 +96,11 @@ if (d=="d2" && strength=="strong"){
 ///////////////////////////////////////////////////////////////////////
                                                                       //Vodka CranMango regular
 if (d=="d2" && strength=="regular"){
-  while (get.units()<55){
+  while (scale.get_units()<41){
     digitalWrite (Vodka, LOW);                                        //pump 1 on
   }
   digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
-  while(get.units()<330 && get.units()>=55){
+  while(scale.get_units()<331 && scale.get_units()>=40){
   digitalWrite (CranMango, LOW);                                      //pump 3 on
   }
   digitalWrite(CranMango, HIGH);                                      // Pump 3 off
@@ -108,7 +109,7 @@ if (d=="d2" && strength=="regular"){
 /////////////////////////////////////////////////////////////////////
                                                                       //Vodka CranMango Virgin
 if (d=="d2" && strength=="virgin"){
-    while(get.units()<330){
+    while(scale.get_units()<331){
   digitalWrite (CranMango, LOW);                                      //pump 3 on
   }
   digitalWrite(CranMango, HIGH);                                      // Pump 3 off
@@ -117,15 +118,15 @@ if (d=="d2" && strength=="virgin"){
 ////////////////////////////////////////////////////////////////
                                                                       //Vodka CranMango Gingerale Strong
 if (d="d3" && strength=="strong"){
-    while (get.units()<104){
+    while (scale.get_units()<75){
     digitalWrite (Vodka, LOW);                                        // pump 1 on
   }
   digitalWrite(Vodka, HIGH);                                          //pump 1 off
-    while (get.units()<217 && get.units()>103){
+    while (scale.get_units()<202 && scale.get_units()>=74){
     digitalWrite (CranMango, LOW);                                    //pump 3 on
   }
   digitalWrite (CranMango, LOW);                                      //pump 3 off
-    while (get.units()<331 && get.units()>216){
+    while (scale.get_units()<331 && scale.get_units()>=201){
       digitalWrite (Vodka, LOW);                                      //turns pump 2 on
   }
   digitalWrite(Vodka, HIGH);                                          //turns pump 2 off
@@ -133,15 +134,15 @@ if (d="d3" && strength=="strong"){
 /////////////////////////////////////////////////////////////////////////
                                                                       //Vodka CranMango Gingerale regular
 if (d=="d3" && strength=="regular"){
-    while (get.units()<56){
+    while (scale.get_units()<41){
     digitalWrite (Vodka, LOW);                                        // pump 1 on
   }
   digitalWrite(Vodka, HIGH);                                          //pump 1 off
-    while (get.units()<192.5 && get.units()>55){
+    while (scale.get_units()<186 && scale.get_units()>=40){
     digitalWrite (CranMango, LOW);                                    //pump 3 on
   }
   digitalWrite (CranMango, LOW);                                      //pump 3 off
-    while (get.units()<331 && get.units()>218){
+    while (scale.get_units()<331 && scale.get_units()>=185){
       digitalWrite (Gingerale, LOW);                                  //turns pump 2 on
   }
   digitalWrite(Gingerale, HIGH);                                      //turns pump 2 off
@@ -149,19 +150,14 @@ if (d=="d3" && strength=="regular"){
 ///////////////////////////////////////////////////////////////////////
                                                                       //Vodka CranMango Gingerale virgin
 if (d=="d3" && strentgh=="virgin"){
-      while (get.units()<166){
+      while (scale.get_units()<166){
     digitalWrite (CranMango, LOW);                                    // pump 3 on
   }
   digitalWrite(CranMango, HIGH);                                      //pump 3 off
-    while (get.units()<331 && get.units()>164){
+    while (scale.get_units()<331 && scale.get_units()>164){
     digitalWrite (Gingerale, LOW);                                    //pump 2 on
   }
   digitalWrite (Gingerale, LOW);                                      //pump 2 off
-    while (get.units()<331 && get.units()>218){
-      digitalWrite (Gingerale, LOW);                                  //turns pump 2 on
-  }
-  digitalWrite(Gingerale, HIGH);                                      //turns pump 2 off
-
 
 }
 
