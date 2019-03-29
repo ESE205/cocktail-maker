@@ -25,16 +25,16 @@ Adafruit_RGBLCDShield lcd = Adafruit_RGBLCDShield();
 #define VIOLET 0x5
 #define WHITE 0x7
 
-String strength;//Strength of Drink (strong,regular,virgin)
-String d;       // Which Drink you are selecting(1,2,3)
-String pDrink; //What is this????????????????????????????????????????????????????????????????????????????????????
+String strength;//state machine
+String d;//Stores drink choice
+String pDrink; // stores last drink
 
-float w1 = 2;//The predetermind weights of what?????????????????????????????????????????????????????????
-float w2 = 3;// what are these???????????????????????????????????????????????????????????
-float w3 = 5;//what are these???????????????????????????????????????????????????????????????????
+float w1 = 2;//The predetermind weights 
+float w2 = 3;
+float w3 = 5;
 
-bool b1 = false;// check checking what?????????????????????????????????????????????????????????
-bool b2 = false;// what do these mean??????????????????????????????????????????????????
+bool b1 = false;// checks each bootle
+bool b2 = false;
 bool b3 = false;
 String b = "check b: ";
 
@@ -46,13 +46,13 @@ int full2 = analogRead(lightPen2); //sets initial condition for bottle 2
 int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
 
 
-enum Drink { // state machine for???????????????????????????????????????????????
-  d1,
-  d2,
-  d3,
-  setI1,
-  setI2,
-  setI3,
+enum Drink { // state machine
+  d1,//drink 1
+  d2,// drink 2
+  d3,// drink 3
+  setI1,//I1 
+  setI2,//I2
+  setI3,//I2
   strong,
   virgin,
   regular,
@@ -63,7 +63,7 @@ enum Drink { // state machine for???????????????????????????????????????????????
   m3
 };
 
-Drink drink = d1; // state machine what is this for???????????????????????????????????????????
+Drink drink = d1; // sets state machine to begining
 
 void setup() {
   // Debugging output
@@ -81,143 +81,130 @@ void setup() {
 
 uint8_t i = 0;
 void loop() {
-//EXPLAIN THESE STEPS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   lcd.setCursor(0, 0);//LCD
   uint8_t buttons = lcd.readButtons();//LCD
   //weight(5);
 
-  switch (drink) {//State Machine WHAT DO EACH OF THE STATES MEAN????
+  switch (drink) {//State Machine
     case d1:
-      if (buttons & BUTTON_RIGHT) {//swtiches state FROM WHAT TO WHAT?????????????????????????????????????????????????
+      if (buttons & BUTTON_RIGHT) {//swtiches to Drink 2
         delay(500);
         lcd.print("Drink 2 ");
         drink = d2;
       }
-      else if (buttons & BUTTON_LEFT) {//swtiches state
+      else if (buttons & BUTTON_LEFT) {//swtiches Drink 3
         delay(500);
         lcd.print("Drink 3 ");
         drink = d3;
       }
-      else if (buttons & BUTTON_SELECT) {//swtiches state
-        digitalWrite(3, HIGH);
+      else if (buttons & BUTTON_SELECT) {//swtiches to check ingredents
         lcd.setBacklight(RED);
         delay(500);
         lcd.print("Regular ");
-        drink = setI1;
-        d = "d1";
-        Serial.println(d);
-
-
+        drink = setI1;//changes states
+        d = "d1";//sets drink
       }
       break;
 
     case d2:
 
-      if (buttons & BUTTON_RIGHT) {//swtiches state
+      if (buttons & BUTTON_RIGHT) {//swtiches to drink 3
         delay(500);
         lcd.print("Drink 3 ");
         drink = d3;
       }
-      else if (buttons & BUTTON_LEFT) {//swtiches state
-
+      else if (buttons & BUTTON_LEFT) {//swtiches to drink 1
         delay(500);
-
         lcd.print("Drink 1 ");
         drink = d1;
       }
       else if (buttons & BUTTON_SELECT) {//swtiches state
         lcd.setBacklight(GREEN);
-        digitalWrite(7, HIGH);
         delay(500);
-
         lcd.print("Regular ");
-        drink = setI1;
+        drink = setI1;// Swtiches to check supplies
         d = "d2";
-        Serial.println(d);
       }
       break;
 
     case d3:
-      if (buttons & BUTTON_RIGHT) {//Change ingredents
+      if (buttons & BUTTON_RIGHT) {//Drink 1
         delay(500);
         lcd.print("Drink 1 ");
         drink = d1;
       }
-      else if (buttons & BUTTON_LEFT) {//Change ingredents
+      else if (buttons & BUTTON_LEFT) {//Drink 2
         delay(500);
         lcd.print("Drink 2 ");
         drink = d2;
       }
       else if (buttons & BUTTON_SELECT) {//Change ingredents
-        digitalWrite(5, HIGH);
         lcd.setBacklight(YELLOW);
         delay(500);
-
         lcd.print("Regular ");
-        drink = setI1;
-        d = "d3";
-        Serial.println(d);
-
+        drink = setI1;// Checks supply change
+        d = "d3";//sets drink to d3
       }
       break;
 
-      //What is this telling us to do???????
+      
    case setI1:
-      if (d == pDrink) {// Drinks are the same as the previous therefore what happens????????????????????????????????????????????
+      if (d == pDrink) {// Drinks are the same as the previous so nothing happens
         d = regular;
         lcd.print("Regular     ");
         break;
-      }
-      else if (d == "d1") {// Drinks differ and.....??????????????????????????????????????????????????????????????????????
+      }//else the drinks differ and the supplies need to be switched
+      else if (d == "d1") {// If it is drink 1
         lcd.print("i1 to bottle1");
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I1
           delay(500);
           lcd.print("i2 to bottle2");
-          drink = setI2;
+          drink = setI2;//sets state to check next bottle
           break;
         }
       }
-      else if (d == "d2") { // what is this?????????????????????????????????????????????????
+      else if (d == "d2") {//if it is drink 2
         lcd.print("i1 to bottle1");
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I1
           delay(500);
           lcd.print("i2 to bottle2");
-          drink = setI2;
+          drink = setI2;//sets state to check next bottle
           break;
         }
       }
-      else if (d == "d3") {
+      else if (d == "d3") {if it is drink 3
         lcd.print("i1 to bottle1");
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I1
           delay(500);
           lcd.print("i2 to bottle2");
-          drink = setI2;
+          drink = setI2;//sets state to check next bottle
           break;
         }
       }
 
     case setI2:
       if (d == "d1") {
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I2
           delay(500);
           lcd.print("i3 to bottle3");
-          drink = setI3;
+          drink = setI3;//sets state to check next bottle
           break;
         }
       }
       else if (d == "d2") {
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I2
           delay(500);
           lcd.print("i3 to bottle3");
-          drink = setI3;
+          drink = setI3;//sets state to check next bottle
           break;
         }
       }
       else if (d == "d3") {
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I2
           delay(500);
           lcd.print("i3 to bottle3");
-          drink = setI3;
+          drink = setI3;//sets state to check next bottle
           break;
         }
       }
@@ -225,7 +212,7 @@ void loop() {
  
 case setI3: //After this state, the drinks switch 
       if (d == "d1") {
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I3
           delay(500);
           lcd.print("Regular    ");
           drink = regular;
@@ -233,7 +220,7 @@ case setI3: //After this state, the drinks switch
         }
       }
       else if (d == "d2") {
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I3
           delay(500);
           lcd.print("Regular     ");
           drink = regular;
@@ -241,7 +228,7 @@ case setI3: //After this state, the drinks switch
         }
       }
       else if (d == "d3") {
-        if (buttons & BUTTON_SELECT) {
+        if (buttons & BUTTON_SELECT) {//once user changes I3
           delay(500);
           lcd.print("Regular       ");
           drink = regular;
@@ -300,7 +287,6 @@ case setI3: //After this state, the drinks switch
         delay(500);
         lcd.print("Are you sure: ");
         drink = sure;
-
         strength = "strong";
         lcd.setCursor(0, 1);
 
@@ -470,7 +456,7 @@ bool check3() {
   return false;
 }
 
-bool weight(float w) { //what is this???????????????????????????????????????????????????????????????????????????
+bool weight(float w) {//returns true if the weight is >= when it needs to switch 
   Serial.print("Reading: ");
   float r = scale.get_units(); //scale.get_units() returns a float
   Serial.print(" lbs"); //You can change this to kg but you'll need to refactor the calibration_factor
