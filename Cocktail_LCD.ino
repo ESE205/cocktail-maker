@@ -45,6 +45,8 @@ int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
 
 
 enum Drink { // What the screen highlights
+  make,
+  set,
   d1,//  drink 1 on the menu
   d2,//  drink 2 on the menu
   d3,//  drink 3 on the menu
@@ -56,10 +58,10 @@ enum Drink { // What the screen highlights
   regular,//Regular on the menu
   sure,//Makes sure the right drink and strength was selected
   check,//Checks the supplies in the 3 bottles
-drinkmaking, //Moves the process to drink making
+drinkmaking //Moves the process to drink making
 };
 
-Drink drink = d1; // starts selection process at drink 1
+Drink drink = set; // starts selection process at drink 1
 
 void setup() {
   pinMode(Vodka, OUTPUT);
@@ -84,7 +86,7 @@ delay(1000);                                                          // let rel
   analogReference(INTERNAL);//sets the reference to internal
 
   lcd.begin(16, 2); //iniaitalizes LCD
-  lcd.print("Drink 1");// sends first message for first state
+  lcd.print("Set Up");// sends first message for first state
 
 }
 
@@ -95,6 +97,46 @@ void loop() {
   uint8_t buttons = lcd.readButtons();//reads buttons that have been selected
 
   switch (drink) {//Selction of drink
+  case set: 
+  if (buttons & BUTTON_SELECT) {
+    delay(500);
+    lcd.print("set alc to b1");
+    while(!(buttons & BUTTON_SELECT)){
+      
+    }
+    delay(500);
+    lcd.print("set mix to b2");
+    while(!(buttons & BUTTON_SELECT)){
+      
+    }
+    lcd.print("set mix to b3");
+    delay(500);
+    while(!(buttons & BUTTON_SELECT)){
+      
+    }
+    drink = d1;
+    lcd.print("d1");
+  }
+  if(buttons & BUTTON_RIGHT||buttons & BUTTON_RIGHT){
+    delay(500);
+    lcd.print("make a drink");
+    drink = make;
+  }
+  break;
+
+    case make:
+if (buttons & BUTTON_SELECT) {
+  delay(500);
+    drink = d1;
+    lcd.print("d1");
+  }
+  if(buttons & BUTTON_RIGHT||buttons & BUTTON_RIGHT){
+    delay(500);
+    lcd.print("set up");
+    drink = set;
+  }
+  break;
+
     case d1: // Places to go from drink 1
       if (buttons & BUTTON_RIGHT) {//switches to Drink 2
         delay(500);
