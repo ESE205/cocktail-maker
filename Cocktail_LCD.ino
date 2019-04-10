@@ -4,7 +4,7 @@
 #include <utility/Adafruit_MCP23017.h>
 #include "HX711.h"
 
-#define calibration_factor
+//#define calibration_factor
 #define Vodka 3                 // (pump1)12VDC motor to pump vodka on pin 3
 #define Gingerale 4             // (pump2) Gingerale connected to pin 4
 #define CranMango 5             // (pump3) CranMango on pin 5
@@ -42,23 +42,26 @@ int lightPen3 = A2 ; //define a pin for Photo resistor of bottle 3
 int full1 = analogRead(lightPen1); //sets initial condition for bottle 1
 int full2 = analogRead(lightPen2); //sets initial condition for bottle 2
 int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
-
+float calibration_factor = -1995;
 
 enum Drink { // What the screen highlights
   make,
   set,
+  alc,
+  mix1,
+  mix2,
   d1,//  drink 1 on the menu
   d2,//  drink 2 on the menu
   d3,//  drink 3 on the menu
-//   setI1,//Change bottle to new I1
-//   setI2,//Change bottle to I2
-//   setI3,//Change bottle to I3
+  //   setI1,//Change bottle to new I1
+  //   setI2,//Change bottle to I2
+  //   setI3,//Change bottle to I3
   strong,// strong on the menu
   virgin,//virgin on the menu
   regular,//Regular on the menu
   sure,//Makes sure the right drink and strength was selected
   check,//Checks the supplies in the 3 bottles
-drinkmaking //Moves the process to drink making
+  drinkmaking //Moves the process to drink making
 };
 
 Drink drink = set; // starts selection process at drink 1
@@ -66,17 +69,17 @@ Drink drink = set; // starts selection process at drink 1
 void setup() {
   pinMode(Vodka, OUTPUT);
 
-pinMode(Gingerale, OUTPUT);
+  pinMode(Gingerale, OUTPUT);
 
-pinMode(CranMango, OUTPUT);
+  pinMode(CranMango, OUTPUT);
 
-digitalWrite (Vodka, HIGH);                                           //pump 1 off
+  digitalWrite (Vodka, HIGH);                                           //pump 1 off
 
-digitalWrite (Gingerale, HIGH);                                       //pump 2 off
+  digitalWrite (Gingerale, HIGH);                                       //pump 2 off
 
-digitalWrite (CranMango, HIGH);                                       //pump 3 off
+  digitalWrite (CranMango, HIGH);                                       //pump 3 off
 
-delay(1000);                                                          // let relays settle down before running the first time.
+  delay(1000);                                                          // let relays settle down before running the first time.
   // Debugging output
   Serial.begin(9600);// Starts the code
 
@@ -97,45 +100,75 @@ void loop() {
   uint8_t buttons = lcd.readButtons();//reads buttons that have been selected
 
   switch (drink) {//Selction of drink
-  case set: 
-  if (buttons & BUTTON_SELECT) {
-    delay(500);
-    lcd.print("set alc to b1");
-    while(!(buttons & BUTTON_SELECT)){
-      
-    }
-    delay(500);
-    lcd.print("set mix to b2");
-    while(!(buttons & BUTTON_SELECT)){
-      
-    }
-    lcd.print("set mix to b3");
-    delay(500);
-    while(!(buttons & BUTTON_SELECT)){
-      
-    }
-    drink = d1;
-    lcd.print("d1");
-  }
-  if(buttons & BUTTON_RIGHT||buttons & BUTTON_RIGHT){
-    delay(500);
-    lcd.print("make a drink");
-    drink = make;
-  }
-  break;
+    case set:
+      if (buttons & BUTTON_SELECT) {//switches to alc instructions
+        delay(500);
+        lcd.print("set alc to b1");
+        drink = alc;
+      }
+      if (buttons & BUTTON_RIGHT) {//switches to make 
+        delay(500);
+        lcd.print("make a drink");
+        drink = make;
+      }
+      if (buttons & BUTTON_LEFT) {//switches to make
+        delay(500);
+        lcd.print("make a drink");
+        drink = make;
+      }
+      break;
 
     case make:
-if (buttons & BUTTON_SELECT) {
-  delay(500);
-    drink = d1;
-    lcd.print("d1");
-  }
-  if(buttons & BUTTON_RIGHT||buttons & BUTTON_RIGHT){
-    delay(500);
-    lcd.print("set up");
-    drink = set;
-  }
-  break;
+      if (buttons & BUTTON_SELECT) {//switches to Drink 1
+        delay(500);
+        drink = d1;
+        lcd.clear();//clears LCD
+        lcd.print("drink 1");
+      }
+      if (buttons & BUTTON_RIGHT) {//switches to set up
+        delay(500);
+        lcd.clear();//clears LCD
+        lcd.print("set up");
+        drink = set;
+      }
+      if (buttons & BUTTON_LEFT) {//switches to set up
+        delay(500);
+        lcd.clear();//clears LCD
+        lcd.print("set up");
+        drink = set;
+      }
+      break;
+
+    case alc:
+      if (buttons & BUTTON_SELECT) {//switches to mix 1 instructions
+        drink = mix1;
+        lcd.clear();//clears LCD
+        lcd.print("set mix to b2");
+        delay(500);
+
+      }
+      break;
+
+    case mix1:
+      if (buttons & BUTTON_SELECT) {//switches to mix 2 instructions
+        drink = mix2;
+        lcd.clear();//clears LCD
+        lcd.print("set mix to b3");
+        delay(500);
+
+      }
+      break;
+
+    case mix2:
+      if (buttons & BUTTON_SELECT) {//switches to Drink 1
+        drink = d1;
+        lcd.clear();//clears LCD
+        lcd.print("drink 1");
+        delay(500);
+
+      }
+      break;
+
 
     case d1: // Places to go from drink 1
       if (buttons & BUTTON_RIGHT) {//switches to Drink 2
@@ -146,11 +179,12 @@ if (buttons & BUTTON_SELECT) {
       else if (buttons & BUTTON_LEFT) {//switches to Drink 3
         delay(500);
         lcd.print("Drink 3 ");//prints Drink 3 on LCD Screen
-        drink = d3;//highlight drink 2 
+        drink = d3;//highlight drink 2
       }
       else if (buttons & BUTTON_SELECT) {//switches ingredients if needed
         lcd.setBacklight(RED);//sets the lcd backround
         delay(500);
+        lcd.print("Regular ");//prints Drink regular on LCD Screen
         drink = regular;//moves the selction process to drink strength.
         d = "d1";//sets drink to drink 1
       }
@@ -171,7 +205,8 @@ if (buttons & BUTTON_SELECT) {
       else if (buttons & BUTTON_SELECT) {//Selects drink 2 and moves on to next menu
         lcd.setBacklight(GREEN);//sets LCD backround
         delay(500);
-        drink = regular;// moves the selection process to drink strength 
+        lcd.print("Regular ");//prints regular on LCD Screen
+        drink = regular;// moves the selection process to drink strength
         d = "d2";// sets drink to drink 2
       }
       break;
@@ -190,7 +225,7 @@ if (buttons & BUTTON_SELECT) {
       else if (buttons & BUTTON_SELECT) {//Selects drink 3 and moves on to next menu
         lcd.setBacklight(YELLOW);
         delay(500);
-        lcd.print("Regular ");
+        lcd.print("Regular ");//prints regular on LCD Screen
         drink = regular;// highlights regular and moves to next selection process
         d = "d3";//sets drink to d3
       }
@@ -199,7 +234,7 @@ if (buttons & BUTTON_SELECT) {
     case regular://Selction choices from regular
       if (buttons & BUTTON_RIGHT) {//switches state to strong
         delay(500);
-        lcd.print("Strong ");
+        lcd.print("Strong    ");
         drink = strong;// highlights strong
       }
       else if (buttons & BUTTON_LEFT) {//switched state to virgin
@@ -223,9 +258,6 @@ if (buttons & BUTTON_SELECT) {
         lcd.clear();
         lcd.print("Drink 1 ");
         lcd.setBacklight(WHITE);
-        digitalWrite(3, LOW);
-        digitalWrite(5, LOW);
-        digitalWrite(7, LOW);
         delay(500);
       }
       break;
@@ -257,9 +289,6 @@ if (buttons & BUTTON_SELECT) {
         lcd.clear();
         lcd.print("Drink 1 ");
         lcd.setBacklight(WHITE);
-        digitalWrite(3, LOW);
-        digitalWrite(5, LOW);
-        digitalWrite(7, LOW);
         delay(500);
       }
       break;
@@ -272,7 +301,7 @@ if (buttons & BUTTON_SELECT) {
       }
       else if (buttons & BUTTON_LEFT) {//moves menu to strong
         delay(500);
-        lcd.print("Strong ");
+        lcd.print("Strong  ");
         drink = strong;//highlights strong
       }
       else if (buttons & BUTTON_SELECT) {//Virgin strength is selected
@@ -292,9 +321,6 @@ if (buttons & BUTTON_SELECT) {
         lcd.clear();
         lcd.print("Drink 1 ");
         lcd.setBacklight(WHITE);
-        digitalWrite(3, LOW);
-        digitalWrite(5, LOW);
-        digitalWrite(7, LOW);
         delay(500);
       }
       break;
@@ -302,8 +328,9 @@ if (buttons & BUTTON_SELECT) {
     case sure:
       if (buttons & BUTTON_SELECT) { //Checks if right selection was made
         delay(500);
-        lcd.print("Making"+d+strength);//Prints on LCD
-        drink = check;//sets state to check how much liquid is remaining
+        lcd.print("Making" + d + strength); //Prints on LCD
+        //drink = check;//sets state to check how much liquid is remaining
+        drink = drinkmaking;//if full then make starts
       }
       else if (buttons & BUTTON_UP) {//return to start
         lcd.clear();
@@ -312,216 +339,224 @@ if (buttons & BUTTON_SELECT) {
         strength = "";
         lcd.print("Drink 1 ");
         lcd.setBacklight(WHITE);
-        digitalWrite(3, LOW);
-        digitalWrite(5, LOW);
-        digitalWrite(7, LOW);
         delay(500);
       }
       break;
-    case check://Checkes the levels of each bottles
-      b1 = check1();
-      if (b1 == false) {//if b1 is empty
-        b = b + "1 ";
-      }
-      b2 = check2();
-      if (b2 == false) {//if b2 is empty
-        b = b + "2 ";
-      }
-      b3 = check3();
-      if (b3 == false) {//if b3 is empty
-        b = b + "3 ";
-      }
-      if (b1 || b2 || b3) { // if a bottle is empty
-        lcd.print(b);
-        break;
-      }
-      drink = drinkmaking;//if full then make starts
-      break;
+    //    case check://Checkes the levels of each bottles
+    //      b1 = check1();
+    //      if (b1 == false) {//if b1 is empty
+    //        b = b + "1 ";
+    //      }
+    //      b2 = check2();
+    //      if (b2 == false) {//if b2 is empty
+    //        b = b + "2 ";
+    //      }
+    //      b3 = check3();
+    //      if (b3 == false) {//if b3 is empty
+    //        b = b + "3 ";
+    //      }
+    //      if (b1 || b2 || b3) { // if a bottle is empty
+    //        lcd.print(b);
+    //        break;
+    //      }
+    //      drink = drinkmaking;//if full then make starts
+    //      break;
 
     case drinkmaking:
       lcd.clear();
       lcd.print("making");//starts the drink making process
+      scale.set_scale(calibration_factor);//Sets the sclae to the calibration factor
+      scale.tare(); //zeros the scale before we start
+      //Vodka Gingerale Strong Drink 1
+      if (d == "d1" && strength == "strong") {
+        while (scale.get_units() < 75) {
+          digitalWrite (Vodka, LOW);                                        //pump 1 on
+        }
+        digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
+        while (scale.get_units() < 331 && scale.get_units() >= 74) {
+          digitalWrite (Gingerale, LOW);                                      //pump 2 on
+        }
+        digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
 
-                                                                      //Vodka Gingerale Strong
-if (d=="d1" && strength=="strong"){
-  while (scale.get_units()<75){
-    digitalWrite (Vodka, LOW);                                        //pump 1 on
-  }
-  digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
-  while(scale.get_units()<331 && scale.get_units()>=74){
-  digitalWrite (Gingerale, LOW);                                      //pump 2 on
-  }
-  digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
-}
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-//////////////////////////////////////////////////////////////////
-                                                                      //Vodka Gingerale Regular
-if (d=="d1" && strength=="regular"){
-  while (scale.get_units()<41){
-    digitalWrite (Vodka, LOW);                                        //pump 1 on
-  }
-  digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
-  while(scale.get_units()<331 && scale.get_units()>=40){
-  digitalWrite (Gingerale, LOW);                                      //pump 2 on
-  }
-  digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
-}  
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-///////////////////////////////////////////////////////////////////
-                                                                      //Vodka Gingerale virgin
-if (d=="d1" && strength=="virgin"){
-  while(scale.get_units()<331){
-  digitalWrite (Gingerale, LOW);                                      //pump 2 on
-  }
-  digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
-}
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-/////////////////////////////////////////////////////////////////////
-                                                                     //Vodka CranMango Strong
-if (d=="d2" && strength=="strong"){
-  while (scale.get_units()<75){
-    digitalWrite (Vodka, LOW);                                       //pump 1 on
-  }
-  digitalWrite (Vodka, HIGH);                                        // Turns pump 1 off
-  while(scale.get_units()<331 && scale.get_units()>=74){
-  digitalWrite (CranMango, LOW);                                     //pump 3 on
-  }
-  digitalWrite(CranMango, HIGH);                                     // Pump 3 off
-}
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-///////////////////////////////////////////////////////////////////////
-                                                                      //Vodka CranMango regular
-if (d=="d2" && strength=="regular"){
-  while (scale.get_units()<41){
-    digitalWrite (Vodka, LOW);                                        //pump 1 on
-  }
-  digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
-  while(scale.get_units()<331 && scale.get_units()>=40){
-  digitalWrite (CranMango, LOW);                                      //pump 3 on
-  }
-  digitalWrite(CranMango, HIGH);                                      // Pump 3 off
-}
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-/////////////////////////////////////////////////////////////////////
-                                                                      //Vodka CranMango Virgin
-if (d=="d2" && strength=="virgin"){
-    while(scale.get_units()<331){
-  digitalWrite (CranMango, LOW);                                      //pump 3 on
-  }
-  digitalWrite(CranMango, HIGH);                                      // Pump 3 off
-}
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-////////////////////////////////////////////////////////////////
-                                                                      //Vodka CranMango Gingerale Strong
-if (d="d3" && strength=="strong"){
-    while (scale.get_units()<75){
-    digitalWrite (Vodka, LOW);                                        // pump 1 on
-  }
-  digitalWrite(Vodka, HIGH);                                          //pump 1 off
-    while (scale.get_units()<202 && scale.get_units()>=74){
-    digitalWrite (CranMango, LOW);                                    //pump 3 on
-  }
-  digitalWrite (CranMango, LOW);                                      //pump 3 off
-    while (scale.get_units()<331 && scale.get_units()>=201){
-      digitalWrite (Vodka, LOW);                                      //turns pump 2 on
-  }
-  digitalWrite(Vodka, HIGH);                                          //turns pump 2 off
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-/////////////////////////////////////////////////////////////////////////
-                                                                      //Vodka CranMango Gingerale regular
-if (d=="d3" && strength=="regular"){
-    while (scale.get_units()<41){
-    digitalWrite (Vodka, LOW);                                        // pump 1 on
-  }
-  digitalWrite(Vodka, HIGH);                                          //pump 1 off
-    while (scale.get_units()<186 && scale.get_units()>=40){
-    digitalWrite (CranMango, LOW);                                    //pump 3 on
-  }
-  digitalWrite (CranMango, LOW);                                      //pump 3 off
-    while (scale.get_units()<331 && scale.get_units()>=185){
-      digitalWrite (Gingerale, LOW);                                  //turns pump 2 on
-  }
-  digitalWrite(Gingerale, HIGH);                                      //turns pump 2 off
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-///////////////////////////////////////////////////////////////////////
-                                                                      //Vodka CranMango Gingerale virgin
-if (d=="d3" && strentgh=="virgin"){
-      while (scale.get_units()<166){
-    digitalWrite (CranMango, LOW);                                    // pump 3 on
-  }
-  digitalWrite(CranMango, HIGH);                                      //pump 3 off
-    while (scale.get_units()<331 && scale.get_units()>164){
-    digitalWrite (Gingerale, LOW);                                    //pump 2 on
-  }
-  digitalWrite (Gingerale, LOW);                                      //pump 2 off
-      lcd.print("Drink Made");//Prints drink is ready
-      delay(5000);
-      lcd.clear();// resets LCD
-      lcd.print("Drink 1");
-      drink = d1; //returns to start
-}
-  }
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      //////////////////////////////////////////////////////////////////
+      //Vodka Gingerale Regular Drink 1
+      if (d == "d1" && strength == "regular") {
+        while (scale.get_units() < 41) {
+          digitalWrite (Vodka, LOW);                                        //pump 1 on
+        }
+        digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
+        while (scale.get_units() < 331 && scale.get_units() >= 40) {
+          digitalWrite (Gingerale, LOW);                                      //pump 2 on
+        }
+        digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
 
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      ///////////////////////////////////////////////////////////////////
+      //Vodka Gingerale virgin Drink 1
+      if (d == "d1" && strength == "virgin") {
+        while (scale.get_units() < 331) {
+          digitalWrite (Gingerale, LOW);                                      //pump 2 on
+        }
+        digitalWrite(Gingerale, HIGH);                                      // Pump 2 off
+
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      /////////////////////////////////////////////////////////////////////
+      //Vodka CranMango Strong Drink 2
+      if (d == "d2" && strength == "strong") {
+        while (scale.get_units() < 75) {
+          digitalWrite (Vodka, LOW);                                       //pump 1 on
+        }
+        digitalWrite (Vodka, HIGH);                                        // Turns pump 1 off
+        while (scale.get_units() < 331 && scale.get_units() >= 74) {
+          digitalWrite (CranMango, LOW);                                     //pump 3 on
+        }
+        digitalWrite(CranMango, HIGH);                                     // Pump 3 off
+
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      ///////////////////////////////////////////////////////////////////////
+      //Vodka CranMango regular  Drink 2
+      if (d == "d2" && strength == "regular") {
+        while (scale.get_units() < 41) {
+          digitalWrite (Vodka, LOW);                                        //pump 1 on
+        }
+        digitalWrite (Vodka, HIGH);                                         // Turns pump 1 off
+        while (scale.get_units() < 331 && scale.get_units() >= 40) {
+          digitalWrite (CranMango, LOW);                                      //pump 3 on
+        }
+        digitalWrite(CranMango, HIGH);                                      // Pump 3 off
+
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      /////////////////////////////////////////////////////////////////////
+      //Vodka CranMango Virgin Drink 2
+      if (d == "d2" && strength == "virgin") {
+        while (scale.get_units() < 331) {
+          digitalWrite (CranMango, LOW);                                      //pump 3 on
+        }
+        digitalWrite(CranMango, HIGH);                                      // Pump 3 off
+
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      ////////////////////////////////////////////////////////////////
+      //Vodka CranMango Gingerale Strong Drink 3
+      if (d = "d3" && strength == "strong") {
+        while (scale.get_units() < 75) {
+          digitalWrite (Vodka, LOW);                                        // pump 1 on
+        }
+        digitalWrite(Vodka, HIGH);                                          //pump 1 off
+        while (scale.get_units() < 202 && scale.get_units() >= 74) {
+          digitalWrite (CranMango, LOW);                                    //pump 3 on
+        }
+        digitalWrite (CranMango, HIGH);                                      //pump 3 off
+        while (scale.get_units() < 331 && scale.get_units() >= 201) {
+          digitalWrite (Vodka, LOW);                                      //turns pump 2 on
+        }
+        digitalWrite(Vodka, HIGH);                                          //turns pump 2 off
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      /////////////////////////////////////////////////////////////////////////
+      //Vodka CranMango Gingerale regular Drink 3
+      if (d == "d3" && strength == "regular") {
+        while (scale.get_units() < 41) {
+          digitalWrite (Vodka, LOW);                                        // pump 1 on
+        }
+        digitalWrite(Vodka, HIGH);                                          //pump 1 off
+        while (scale.get_units() < 186 && scale.get_units() >= 40) {
+          digitalWrite (CranMango, LOW);                                    //pump 3 on
+        }
+        digitalWrite (CranMango, HIGH);                                      //pump 3 off
+        while (scale.get_units() < 331 && scale.get_units() >= 185) {
+          digitalWrite (Gingerale, LOW);                                  //turns pump 2 on
+        }
+        digitalWrite(Gingerale, HIGH);                                      //turns pump 2 off
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+      ///////////////////////////////////////////////////////////////////////
+      //Vodka CranMango Gingerale virgin Drink 3
+      if (d == "d3" && strength == "virgin") {
+        while (scale.get_units() < 166) {
+          digitalWrite (CranMango, LOW);                                    // pump 3 on
+        }
+        digitalWrite(CranMango, HIGH);                                      //pump 3 off
+        while (scale.get_units() < 331 && scale.get_units() > 164) {
+          digitalWrite (Gingerale, LOW);                                    //pump 2 on
+        }
+        digitalWrite (Gingerale, LOW);                                      //pump 2 off
+        lcd.print("Drink Made");//Prints drink is ready
+        delay(5000);
+        lcd.clear();// resets LCD
+        lcd.print("Drink 1");
+        drink = d1; //returns to start
+      }
+
+
+  }
 }
+
 
 
 // helper methods
 
-bool check1() {
-  if (analogRead(lightPen1) < .8 * full1) { //Tests to see if bottle 1 is empty
-    delay(10);
-    return true;
-  }
-  return false;
-
-}
-
-
-bool check2() {
-  if (analogRead(lightPen2) < .8 * full2) { // Test to see if bottle 2 is empty
-    delay(10);
-    return true;
-  }
-  return false;
-}
-
-bool check3() {
-  if (analogRead(lightPen3) < .8 * full3) { // Tests to see if bottle 3 is empty
-    delay(10);
-    return true;
-  }
-  return false;
-}
+//      bool check1() {
+//        if (analogRead(lightPen1) < .8 * full1) { //Tests to see if bottle 1 is empty
+//          delay(10);
+//          return true;
+//        }
+//        return false;
+//
+//      }
+//
+//
+//      bool check2() {
+//        if (analogRead(lightPen2) < .8 * full2) { // Test to see if bottle 2 is empty
+//          delay(10);
+//          return true;
+//        }
+//        return false;
+//      }
+//
+//      bool check3() {
+//        if (analogRead(lightPen3) < .8 * full3) { // Tests to see if bottle 3 is empty
+//          delay(10);
+//          return true;
+//        }
+//        return false;
+//      }
 
