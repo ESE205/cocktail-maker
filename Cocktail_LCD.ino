@@ -36,9 +36,9 @@ bool b2 = false; // This checks to see if bottle 2 is empty
 bool b3 = false;// This checks to see if bottle 3 is empty
 String b = "check b: ";//Tells which bottle is empty if any
 
-int lightPen1 = A0; //define a pin for Photo resistor of bottle 1
-int lightPen2 = A1 ; //define a pin for Photo resistor of bottle 2
-int lightPen3 = A2 ; //define a pin for Photo resistor of bottle 3
+int lightPen1 = A2; //define a pin for Photo resistor of bottle 1
+int lightPen2 = A3 ; //define a pin for Photo resistor of bottle 2
+int lightPen3 = A4 ; //define a pin for Photo resistor of bottle 3
 int full1 = analogRead(lightPen1); //sets initial condition for bottle 1
 int full2 = analogRead(lightPen2); //sets initial condition for bottle 2
 int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
@@ -329,7 +329,6 @@ void loop() {
       if (buttons & BUTTON_SELECT) { //Checks if right selection was made
         delay(500);
         lcd.print("Making" + d + strength); //Prints on LCD
-        //drink = check;//sets state to check how much liquid is remaining
         drink = drinkmaking;//if full then make starts
       }
       else if (buttons & BUTTON_UP) {//return to start
@@ -342,31 +341,32 @@ void loop() {
         delay(500);
       }
       break;
-    //    case check://Checkes the levels of each bottles
-    //      b1 = check1();
-    //      if (b1 == false) {//if b1 is empty
-    //        b = b + "1 ";
-    //      }
-    //      b2 = check2();
-    //      if (b2 == false) {//if b2 is empty
-    //        b = b + "2 ";
-    //      }
-    //      b3 = check3();
-    //      if (b3 == false) {//if b3 is empty
-    //        b = b + "3 ";
-    //      }
-    //      if (b1 || b2 || b3) { // if a bottle is empty
-    //        lcd.print(b);
-    //        break;
-    //      }
-    //      drink = drinkmaking;//if full then make starts
-    //      break;
+       case check://Checkes the levels of each bottles
+         b1 = check1();
+         if (b1 == false) {//if b1 is empty
+           b = b + "1 ";
+         }
+         b2 = check2();
+         if (b2 == false) {//if b2 is empty
+           b = b + "2 ";
+         }
+         b3 = check3();
+         if (b3 == false) {//if b3 is empty
+           b = b + "3 ";
+         }
+         if (b1 || b2 || b3) { // if a bottle is empty
+           lcd.print(b);
+           break;
+         }
+         drink = d1;//if full then process starts over
+         break;
 
     case drinkmaking:
       lcd.clear();
       lcd.print("making");//starts the drink making process
       scale.set_scale(calibration_factor);//Sets the sclae to the calibration factor
       scale.tare(); //zeros the scale before we start
+      ////////////////////////////////////////////////////////////////////////////////////
       //Vodka Gingerale Strong Drink 1
       if (d == "d1" && strength == "strong") {
         while (scale.get_units() < 75) {
@@ -382,7 +382,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check; //checks liquid levels
       }
       //////////////////////////////////////////////////////////////////
       //Vodka Gingerale Regular Drink 1
@@ -400,7 +400,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check; //Checks liquid levels
       }
       ///////////////////////////////////////////////////////////////////
       //Vodka Gingerale virgin Drink 1
@@ -414,7 +414,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check; //Checks Liquids levels
       }
       /////////////////////////////////////////////////////////////////////
       //Vodka CranMango Strong Drink 2
@@ -432,7 +432,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check; //Checks liquid levels
       }
       ///////////////////////////////////////////////////////////////////////
       //Vodka CranMango regular  Drink 2
@@ -450,7 +450,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check; //Checks liquid levels
       }
       /////////////////////////////////////////////////////////////////////
       //Vodka CranMango Virgin Drink 2
@@ -464,7 +464,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check; //checks liquid levels
       }
       ////////////////////////////////////////////////////////////////
       //Vodka CranMango Gingerale Strong Drink 3
@@ -485,7 +485,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check;//checks liquid levels
       }
       /////////////////////////////////////////////////////////////////////////
       //Vodka CranMango Gingerale regular Drink 3
@@ -506,7 +506,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check;//checks liquid levels
       }
       ///////////////////////////////////////////////////////////////////////
       //Vodka CranMango Gingerale virgin Drink 3
@@ -523,7 +523,7 @@ void loop() {
         delay(5000);
         lcd.clear();// resets LCD
         lcd.print("Drink 1");
-        drink = d1; //returns to start
+        drink = check;//checks liquid levels
       }
 
 
@@ -534,29 +534,29 @@ void loop() {
 
 // helper methods
 
-//      bool check1() {
-//        if (analogRead(lightPen1) < .8 * full1) { //Tests to see if bottle 1 is empty
-//          delay(10);
-//          return true;
-//        }
-//        return false;
-//
-//      }
-//
-//
-//      bool check2() {
-//        if (analogRead(lightPen2) < .8 * full2) { // Test to see if bottle 2 is empty
-//          delay(10);
-//          return true;
-//        }
-//        return false;
-//      }
-//
-//      bool check3() {
-//        if (analogRead(lightPen3) < .8 * full3) { // Tests to see if bottle 3 is empty
-//          delay(10);
-//          return true;
-//        }
-//        return false;
-//      }
+     bool check1() {
+       if (analogRead(lightPen1) < .8 * full1) { //Tests to see if bottle 1 is empty
+         delay(10);
+         return true;
+       }
+       return false;
+
+     }
+
+
+     bool check2() {
+       if (analogRead(lightPen2) < .8 * full2) { // Test to see if bottle 2 is empty
+         delay(10);
+         return true;
+       }
+       return false;
+     }
+
+     bool check3() {
+       if (analogRead(lightPen3) < .8 * full3) { // Tests to see if bottle 3 is empty
+         delay(10);
+         return true;
+       }
+       return false;
+     }
 
