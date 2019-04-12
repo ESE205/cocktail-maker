@@ -99,51 +99,51 @@ void loop() {
   lcd.setCursor(0, 0);//set LCD to first row
   uint8_t buttons = lcd.readButtons();//reads buttons that have been selected
 
-  switch (drink) {//Selction of drink
-    case set:
+  switch (drink) {//Selction of drink. Will lead into making a drink
+    case set://set up mode
       if (buttons & BUTTON_SELECT) {//switches to alc instructions
         delay(500);
-        lcd.print("set alc to b1");
-        drink = alc;
+        lcd.print("set alc to b1");//prints to lcd
+        drink = alc;//sets state to alcohol instructions
       }
       if (buttons & BUTTON_RIGHT) {//switches to make 
         delay(500);
-        lcd.print("make a drink");
-        drink = make;
+        lcd.print("make a drink");//prints to lcd
+        drink = make;//sets state to make
       }
       if (buttons & BUTTON_LEFT) {//switches to make
         delay(500);
-        lcd.print("make a drink");
-        drink = make;
+        lcd.print("make a drink");//prints to lcd
+        drink = make;//sets state to make 
       }
       break;
 
-    case make:
+    case make://make a drink mode
       if (buttons & BUTTON_SELECT) {//switches to Drink 1
         delay(500);
-        drink = d1;
+        drink = d1;//sets state to drink 1
         lcd.clear();//clears LCD
-        lcd.print("drink 1");
+        lcd.print("drink 1");//prints to lcd
       }
       if (buttons & BUTTON_RIGHT) {//switches to set up
         delay(500);
         lcd.clear();//clears LCD
         lcd.print("set up");
-        drink = set;
+        drink = set;// sets state to set up instructions
       }
       if (buttons & BUTTON_LEFT) {//switches to set up
         delay(500);
         lcd.clear();//clears LCD
         lcd.print("set up");
-        drink = set;
+        drink = set;// sets state to set up instructions
       }
       break;
 
     case alc:
       if (buttons & BUTTON_SELECT) {//switches to mix 1 instructions
-        drink = mix1;
+        drink = mix1;// sets state to 1st mix instructions
         lcd.clear();//clears LCD
-        lcd.print("set mix to b2");
+        lcd.print("set mix to b2");//prints to lcd
         delay(500);
 
       }
@@ -151,9 +151,9 @@ void loop() {
 
     case mix1:
       if (buttons & BUTTON_SELECT) {//switches to mix 2 instructions
-        drink = mix2;
+        drink = mix2;//sets state to 2nd mix instructions
         lcd.clear();//clears LCD
-        lcd.print("set mix to b3");
+        lcd.print("set mix to b3");//prints to lcd
         delay(500);
 
       }
@@ -161,9 +161,9 @@ void loop() {
 
     case mix2:
       if (buttons & BUTTON_SELECT) {//switches to Drink 1
-        drink = d1;
+        drink = d1;//sets state to drink 1 
         lcd.clear();//clears LCD
-        lcd.print("drink 1");
+        lcd.print("drink 1");//prints to lcd
         delay(500);
 
       }
@@ -533,13 +533,13 @@ void loop() {
 
 
 // helper methods
-
+// The 3 checks function the same. This is for the 3 bottles. 
      bool check1() {
        if (analogRead(lightPen1) < .8 * full1) { //Tests to see if bottle 1 is empty
          delay(10);
-         return true;
+         return true;//returns true if empty
        }
-       return false;
+       return false;//returns false if not empty
 
      }
 
