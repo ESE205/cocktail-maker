@@ -34,7 +34,7 @@ String d;//Stores drink choice
 bool b1 = false;// This Checks to see if bottle 1 is empty
 bool b2 = false; // This checks to see if bottle 2 is empty
 bool b3 = false;// This checks to see if bottle 3 is empty
-String b = "check b: ";//Tells which bottle is empty if any
+String b = "check bottles";//Tells which bottle is empty if any
 
 int lightPen1 = A2; //define a pin for Photo resistor of bottle 1
 int lightPen2 = A3 ; //define a pin for Photo resistor of bottle 2
@@ -169,7 +169,11 @@ void loop() {
       }
       break;
 
-
+    case check bottles://If bottles are empty
+      if(buttons & BUTTON_SELECT)
+      {
+        drink=d1;//Starts the menu back over
+      }
     case d1: // Places to go from drink 1
       if (buttons & BUTTON_RIGHT) {//switches to Drink 2
         delay(500);
@@ -343,17 +347,8 @@ void loop() {
       break;
        case check://Checkes the levels of each bottles
          b1 = check1();
-         if (b1 == false) {//if b1 is empty
-           b = b + "1 ";
-         }
          b2 = check2();
-         if (b2 == false) {//if b2 is empty
-           b = b + "2 ";
-         }
          b3 = check3();
-         if (b3 == false) {//if b3 is empty
-           b = b + "3 ";
-         }
          if (b1 || b2 || b3) { // if a bottle is empty
            lcd.print(b);
            break;
