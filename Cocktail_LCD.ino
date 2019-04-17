@@ -351,6 +351,7 @@ void loop() {
          b3 = check3();
          if (b1 || b2 || b3) { // if a bottle is empty
            lcd.print(b);
+           drink=check bottles;
            break;
          }
          drink = d1;//if full then process starts over
