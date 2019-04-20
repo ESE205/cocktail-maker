@@ -42,7 +42,7 @@ int lightPen3 = A4 ; //define a pin for Photo resistor of bottle 3
 int full1 = analogRead(lightPen1); //sets initial condition for bottle 1
 int full2 = analogRead(lightPen2); //sets initial condition for bottle 2
 int full3 = analogRead(lightPen3); //sets initial condition for bottle 3
-float calibration_factor = -1995;
+float calibration_factor = 1020;
 
 enum Drink { // What the screen highlights
   make,
